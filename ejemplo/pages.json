@@ -1,0 +1,12 @@
+{
+  "base_url": "http://localhost:8000",
+  "viewports": [
+    {"name": "Desktop", "width": 1440, "height": 900},
+    {"name": "Móvil", "width": 390, "height": 844}
+  ],
+  "pages": [
+    {"name": "Inicio",   "path": "/"},
+    {"name": "Mapa",     "path": "/", "actions": [{"click": "nav >> text=Mapa"}]},
+    {"name": "Contacto", "path": "/", "actions": [{"click": "nav >> text=Contacto"}]}
+  ]
+}

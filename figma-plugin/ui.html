@@ -1,0 +1,60 @@
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 12px/1.45 Inter, system-ui, sans-serif; margin: 0; padding: 16px; color: var(--figma-color-text, #222); background: var(--figma-color-bg, #fff); }
+  h1 { font-size: 13px; margin: 0 0 4px; }
+  p.hint { margin: 0 0 12px; color: var(--figma-color-text-secondary, #777); }
+  .drop { border: 1.5px dashed var(--figma-color-border-strong, #bbb); border-radius: 8px; padding: 18px; text-align: center; cursor: pointer; }
+  .drop.ok { border-style: solid; border-color: var(--figma-color-border-success, #14ae5c); }
+  label.opt { display: flex; gap: 8px; align-items: flex-start; margin: 10px 0 0; }
+  button { margin-top: 14px; width: 100%; height: 32px; border: 0; border-radius: 6px; font-weight: 600; background: var(--figma-color-bg-brand, #0d99ff); color: #fff; cursor: pointer; }
+  button:disabled { opacity: .45; cursor: default; }
+  #log { margin-top: 10px; min-height: 18px; user-select: text; font-size: 11px; color: var(--figma-color-text-secondary, #666); white-space: pre-wrap; }
+</style>
+
+<h1>Make → Design</h1>
+<p class="hint">Carga el <b>design.json</b> generado con <code>make2design.py</code>.</p>
+
+<div class="drop" id="drop">Arrastra aquí design.json<br>o haz clic para elegirlo</div>
+<input type="file" id="file" accept=".json,application/json" hidden />
+
+<label class="opt"><input type="checkbox" id="pages" checked />
+  <span>Una página de Figma por pantalla<br><small>Desmárcalo si tu plan limita el número de páginas: todo irá como frames en la página actual.</small></span></label>
+<label class="opt"><input type="checkbox" id="reference" checked />
+  <span>Poner la captura original al lado de cada frame<br><small>Bloqueada, para comparar visualmente.</small></span></label>
+
+<label class="opt"><input type="checkbox" id="vector" />
+  <span>Textos como vectores<br><small>Se activa solo si tu Figma no deja cargar fuentes (p. ej. en Linux). Se ven idénticos pero no se editan como texto.</small></span></label>
+
+<button id="go" disabled>Importar</button>
+<div id="log"></div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  let data = null;
+  function load(file) {
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        data = JSON.parse(r.result);
+        if (!data.pages) throw new Error("El JSON no tiene 'pages'");
+        $("drop").classList.add("ok");
+        $("drop").innerHTML = `<b>${file.name}</b><br>${data.pages.length} pantallas: ${data.pages.map(p => p.name).join(", ")}`;
+        $("go").disabled = false;
+      } catch (e) { $("log").textContent = "Archivo inválido: " + e.message; }
+    };
+    r.readAsText(file);
+  }
+  $("drop").onclick = () => $("file").click();
+  $("file").onchange = (e) => e.target.files[0] && load(e.target.files[0]);
+  $("drop").ondragover = (e) => e.preventDefault();
+  $("drop").ondrop = (e) => { e.preventDefault(); e.dataTransfer.files[0] && load(e.dataTransfer.files[0]); };
+  $("go").onclick = () => {
+    $("go").disabled = true;
+    parent.postMessage({ pluginMessage: { type: "import", data, options: { pages: $("pages").checked, reference: $("reference").checked, vectorText: $("vector").checked } } }, "*");
+  };
+  onmessage = (e) => {
+    const m = e.data.pluginMessage; if (!m) return;
+    if (m.type === "progress") $("log").textContent = m.text;
+    if (m.type === "done" || m.type === "error") { $("log").textContent = m.text; $("go").disabled = false; }
+  };
+</script>

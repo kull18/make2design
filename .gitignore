@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+env/
+ENV/
+
+# Output files
+design.json
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db

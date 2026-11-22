@@ -1,0 +1,58 @@
+{
+  "base_url": "http://localhost:5173",
+  "wait_ms": 800,
+  "fonts": {
+    "sans": "Inter",
+    "mono": "JetBrains Mono"
+  },
+  "viewports": [
+    {
+      "name": "Desktop",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "name": "Móvil",
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "pages": [
+    {
+      "name": "Inicio",
+      "path": "/"
+    },
+    {
+      "name": "Mapa",
+      "path": "/",
+      "actions": [
+        {
+          "click": "nav >> text=Mapa"
+        }
+      ]
+    },
+    {
+      "name": "Contacto",
+      "path": "/",
+      "actions": [
+        {
+          "click": "nav >> text=Contacto"
+        }
+      ]
+    },
+    {
+      "name": "Login (con error)",
+      "path": "/login",
+      "actions": [
+        {
+          "fill": "input[type=email]",
+          "value": "correo@ejemplo.com"
+        },
+        {
+          "click": "button:has-text('Entrar')",
+          "wait": 1000
+        }
+      ]
+    }
+  ]
+}
